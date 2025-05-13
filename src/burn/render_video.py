@@ -3,6 +3,7 @@
 import argparse
 import os
 import subprocess
+from pathlib import Path
 from src.log.logger import scan_log
 from src.config import (
     MODEL_TYPE,
@@ -15,8 +16,11 @@ from db.conn import insert_upload_queue
 def normalize_video_path(filepath):
     """Normalize the video path to upload
     Args:
-        filepath: str, the path of video
+        filepath: str or Path, the path of video
     """
+    if isinstance(filepath, Path):
+        filepath = str(filepath)
+    
     parts = filepath.rsplit("/", 1)[-1].split("_")
     date_time_parts = parts[1].split("-")
     new_date_time = f"{date_time_parts[0][:4]}-{date_time_parts[0][4:6]}-{date_time_parts[0][6:8]}-{date_time_parts[1]}-{date_time_parts[2]}"
@@ -32,9 +36,14 @@ def check_file_size(file_path):
 def format_video(in_video_path, out_video_path):
     """Convert flv video to mp4 format
     Args:
-        in_video_path: str, the path of input flv video
-        out_video_path: str, the path of output mp4 video
+        in_video_path: str or Path, the path of input flv video
+        out_video_path: str or Path, the path of output mp4 video
     """
+    if isinstance(in_video_path, Path):
+        in_video_path = str(in_video_path)
+    if isinstance(out_video_path, Path):
+        out_video_path = str(out_video_path)
+
     scan_log.info("Converting video format...")
     command = [
         "ffmpeg",
@@ -61,6 +70,13 @@ def format_video(in_video_path, out_video_path):
 
 
 def render_video(video_path):
+    """Process video file
+    Args:
+        video_path: str or Path, the path of video to process
+    """
+    if isinstance(video_path, Path):
+        video_path = str(video_path)
+
     if not os.path.exists(video_path):
         scan_log.error(f"Video file not found: {video_path}")
         return
@@ -71,12 +87,18 @@ def render_video(video_path):
     xml_path = original_video_path[:-4] + ".xml"
     jsonl_path = original_video_path[:-4] + ".jsonl"
 
-    # Format the video from flv to mp4
-    format_video(original_video_path, format_video_path)
+    # Check if the file is already in mp4 format
+    if original_video_path.lower().endswith('.mp4'):
+        scan_log.info("File is already in mp4 format, just renaming...")
+        if original_video_path != format_video_path:
+            os.rename(original_video_path, format_video_path)
+    else:
+        # Format the video from flv to mp4
+        format_video(original_video_path, format_video_path)
 
     # Delete relative files
     for remove_path in [original_video_path, xml_path, jsonl_path]:
-        if os.path.exists(remove_path):
+        if os.path.exists(remove_path) and remove_path != format_video_path:
             os.remove(remove_path)
 
     if not insert_upload_queue(format_video_path):

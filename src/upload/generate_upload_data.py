@@ -21,7 +21,9 @@ def generate_video_data(video_path):
     tid = TID
     tag = generate_tag(video_path)
     source = generate_source(video_path)
-    return title, desc, tid, tag, source
+    cover = ""  # 默认不设置封面
+    dynamic = ""  # 默认不设置动态
+    return title, desc, tid, tag, source, cover, dynamic
 
 
 if __name__ == "__main__":

@@ -8,9 +8,8 @@ from src.config import (
     MODEL_TYPE,
     VIDEOS_DIR,
     RESERVE_FOR_FIXING,
-    GPU_EXIST,
 )
-from src.upload.upload_queue import insert_upload_queue
+from db.conn import insert_upload_queue
 
 
 def normalize_video_path(filepath):
@@ -36,46 +35,20 @@ def format_video(in_video_path, out_video_path):
         in_video_path: str, the path of input flv video
         out_video_path: str, the path of output mp4 video
     """
-    if GPU_EXIST:
-        scan_log.info("Current Mode: GPU")
-        command = [
-            "ffmpeg",
-            "-y",
-            "-hwaccel",
-            "cuda",
-            "-c:v",
-            "h264_cuvid",
-            "-i",
-            in_video_path,
-            "-c:v",
-            "h264_nvenc",
-            "-preset",
-            "p4",
-            "-tune",
-            "hq",
-            "-b:v",
-            "0",
-            "-maxrate",
-            "5M",
-            "-bufsize",
-            "10M",
-            out_video_path,
-        ]
-    else:
-        scan_log.info("Current Mode: CPU")
-        command = [
-            "ffmpeg",
-            "-y",
-            "-i",
-            in_video_path,
-            "-c:v",
-            "libx264",
-            "-preset",
-            "medium",
-            "-crf",
-            "23",
-            out_video_path,
-        ]
+    scan_log.info("Converting video format...")
+    command = [
+        "ffmpeg",
+        "-y",
+        "-i",
+        in_video_path,
+        "-c:v",
+        "libx264",
+        "-preset",
+        "medium",
+        "-crf",
+        "23",
+        out_video_path,
+    ]
 
     try:
         result = subprocess.run(command, check=True, capture_output=True, text=True)

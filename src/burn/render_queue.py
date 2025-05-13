@@ -2,7 +2,6 @@
 
 import queue
 import time
-from src.subtitle.subtitle_generator import generate_subtitle
 from src.burn.render_video import render_video
 from src.log.logger import scan_log
 
@@ -12,10 +11,14 @@ class VideoRenderQueue:
         self.render_queue = queue.Queue()
 
     def pipeline_render(self, video_path):
-        generate_subtitle(video_path)
+        """Add video to render queue
+        Args:
+            video_path: str, the path of video to be processed
+        """
         self.render_queue.put(video_path)
 
     def monitor_queue(self):
+        """Monitor the render queue and process videos"""
         while True:
             if not self.render_queue.empty():
                 video_path = self.render_queue.get()

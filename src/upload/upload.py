@@ -8,7 +8,6 @@ from src.config import (
     BILIVE_DIR,
     RESERVE_FOR_FIXING,
     UPLOAD_LINE,
-    GENERATE_COVER,
 )
 from datetime import datetime
 from src.upload.generate_upload_data import generate_video_data

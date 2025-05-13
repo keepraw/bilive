@@ -35,7 +35,7 @@ Solution: Usually ffmpeg cannot render expressions, so many expressions will rep
 
 ## Why are the rendered danmaku and subtitles a square?
 
-This is a font missing problem, often appearing in manual deployment, I default use Microsoft YaHei font, there is msyh.ttf in the assets directory of the project, install it. The docker version should not have this problem, because it has completed this process in the dockerfile. Of course, if you want to use other fonts, you can also specify the corresponding font in the DanmakuFactory instruction during conversion.
+This is a font missing problem, often appearing in manual deployment, I default use Microsoft YaHei font, there is msyh.ttf in the assets directory of the project, install it.
 
 ## Why did you change back to the queue rendering method?
 
@@ -62,3 +62,22 @@ Solution: Modify the `MIN_VIDEO_SIZE` value in `src/config` to the limit you nee
 The log shows that the nvidia gpu driver and cuda version of your ubuntu may not match, and the cuda core may not be correctly called.
 
 Solution: Refer to [this article](https://zhuanlan.zhihu.com/p/466793485).
+
+### 3. Burn danmaku and subtitles
+
+> [!TIP]
+> - The configuration related to danmaku and subtitle burning is in the `[model]` section of the `bilive.toml` file.
+> - `model_type` can be "pipeline", "append", or "merge".
+> - If you choose "pipeline", the danmaku will be burned into the video directly.
+> - If you choose "append", the danmaku and subtitles will be burned into the video.
+> - If you choose "merge", the danmaku and subtitles will be burned into the video, and the video will be merged with the previous video.
+
+### 4. Upload to Bilibili
+
+> [!TIP]
+> - The configuration related to video upload is in the `[video]` section of the `bilive.toml` file.
+> - `title` and `description` can use keywords: {artist}, {date}, {title}, {source_link}.
+> - `tid` is the video category ID, see https://bilitool.timerring.com/tid.html.
+> - `gift_price_filter` is the minimum price of gifts to be filtered, unit: RMB.
+> - `reserve_for_fixing` is whether to reserve the video for fixing if MOOV crash error occurs.
+> - `upload_line` is the upload line to be used, default is "auto" (recommended), can be "bldsa", "ws", "tx", "qn", "bda2".

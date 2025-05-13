@@ -3,26 +3,14 @@
 import argparse
 import os
 import subprocess
-from src.config import (
-    SRC_DIR,
-    MODEL_TYPE,
-    AUTO_SLICE,
-    SLICE_DURATION,
-    MIN_VIDEO_SIZE,
-    VIDEOS_DIR,
-    SLICE_NUM,
-    SLICE_OVERLAP,
-    SLICE_STEP,
-)
-from src.danmaku.generate_danmakus import get_resolution, process_danmakus
-from src.subtitle.subtitle_generator import generate_subtitle
-from src.burn.render_command import render_command
-from autoslice import slice_video_by_danmaku
-from src.autoslice.inject_metadata import inject_metadata
-from src.autoslice.title_generator import generate_title
-from src.upload.extract_video_info import get_video_info
 from src.log.logger import scan_log
-from db.conn import insert_upload_queue
+from src.config import (
+    MODEL_TYPE,
+    VIDEOS_DIR,
+    RESERVE_FOR_FIXING,
+    GPU_EXIST,
+)
+from src.upload.upload_queue import insert_upload_queue
 
 
 def normalize_video_path(filepath):
@@ -42,74 +30,81 @@ def check_file_size(file_path):
     return file_size_mb
 
 
-def render_video(video_path):
-    if not os.path.exists(video_path):
-        scan_log.error(f"File {video_path} does not exist.")
-        return
-
-    original_video_path = str(video_path)
-    format_video_path = normalize_video_path(original_video_path)
-    xml_path = original_video_path[:-4] + ".xml"
-    ass_path = original_video_path[:-4] + ".ass"
-    srt_path = original_video_path[:-4] + ".srt"
-    jsonl_path = original_video_path[:-4] + ".jsonl"
+def format_video(in_video_path, out_video_path):
+    """Convert flv video to mp4 format
+    Args:
+        in_video_path: str, the path of input flv video
+        out_video_path: str, the path of output mp4 video
+    """
+    if GPU_EXIST:
+        scan_log.info("Current Mode: GPU")
+        command = [
+            "ffmpeg",
+            "-y",
+            "-hwaccel",
+            "cuda",
+            "-c:v",
+            "h264_cuvid",
+            "-i",
+            in_video_path,
+            "-c:v",
+            "h264_nvenc",
+            "-preset",
+            "p4",
+            "-tune",
+            "hq",
+            "-b:v",
+            "0",
+            "-maxrate",
+            "5M",
+            "-bufsize",
+            "10M",
+            out_video_path,
+        ]
+    else:
+        scan_log.info("Current Mode: CPU")
+        command = [
+            "ffmpeg",
+            "-y",
+            "-i",
+            in_video_path,
+            "-c:v",
+            "libx264",
+            "-preset",
+            "medium",
+            "-crf",
+            "23",
+            out_video_path,
+        ]
 
     try:
-        # Recoginze the resolution of video
-        resolution_x, resolution_y = get_resolution(original_video_path)
-        # Process the danmakus to ass and remove emojis
-        subtitle_font_size, subtitle_margin_v = process_danmakus(
-            xml_path, resolution_x, resolution_y
-        )
-    # except TypeError as e:
-    #     scan_log.error(f"TypeError: {e} - Check the return value of process_danmakus")
-    # except FileNotFoundError as e:
-    #     scan_log.error(f"FileNotFoundError: {e} - Check if the file exists")
-    except Exception as e:
-        scan_log.error(f"Error in process_danmakus: {e}")
-        subtitle_font_size = "16"
-        subtitle_margin_v = "60"
+        result = subprocess.run(command, check=True, capture_output=True, text=True)
+        scan_log.debug(f"FFmpeg output: {result.stdout}")
+        if result.stderr:
+            scan_log.debug(f"FFmpeg debug: {result.stderr}")
+    except subprocess.CalledProcessError as e:
+        scan_log.error(f"Error: {e.stderr}")
+        raise
 
-    # Generate the srt file via whisper model
-    if MODEL_TYPE != "pipeline":
-        generate_subtitle(original_video_path)
 
-    # Burn danmaku or subtitles into the videos
-    render_command(
-        original_video_path, format_video_path, subtitle_font_size, subtitle_margin_v
-    )
-    scan_log.info("Complete danamku burning and wait for uploading!")
+def render_video(video_path):
+    if not os.path.exists(video_path):
+        scan_log.error(f"Video file not found: {video_path}")
+        return
 
-    if AUTO_SLICE:
-        if check_file_size(format_video_path) > MIN_VIDEO_SIZE:
-            title, artist, date = get_video_info(format_video_path)
-            slices_path = slice_video_by_danmaku(
-                ass_path,
-                format_video_path,
-                SLICE_DURATION,
-                SLICE_NUM,
-                SLICE_OVERLAP,
-                SLICE_STEP,
-            )
-            for slice_path in slices_path:
-                try:
-                    slice_title = generate_title(slice_path, artist)
-                    slice_video_flv_path = slice_path[:-4] + ".flv"
-                    inject_metadata(slice_path, slice_title, slice_video_flv_path)
-                    os.remove(slice_path)
-                    if not insert_upload_queue(slice_video_flv_path):
-                        scan_log.error("Cannot insert the video to the upload queue")
-                except Exception as e:
-                    scan_log.error(f"Error in {slice_path}: {e}")
+    # Get the video info
+    original_video_path = video_path
+    format_video_path = normalize_video_path(original_video_path)
+    xml_path = original_video_path[:-4] + ".xml"
+    jsonl_path = original_video_path[:-4] + ".jsonl"
+
+    # Format the video from flv to mp4
+    format_video(original_video_path, format_video_path)
 
     # Delete relative files
-    for remove_path in [original_video_path, xml_path, ass_path, srt_path, jsonl_path]:
+    for remove_path in [original_video_path, xml_path, jsonl_path]:
         if os.path.exists(remove_path):
             os.remove(remove_path)
-
-    # # For test
-    # test_path = original_video_path[:-4]
-    # os.rename(original_video_path, test_path)
 
     if not insert_upload_queue(format_video_path):
         scan_log.error("Cannot insert the video to the upload queue")

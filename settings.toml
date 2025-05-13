@@ -3,14 +3,10 @@ webhooks = []
 
 # blrec Settings
 [[tasks]]
-room_id = 173551
+room_id = 23384133
 enable_monitor = true
 enable_recorder = true
 
-[[tasks]]
-room_id = 7734200
-enable_monitor = true
-enable_recorder = true
 
 [output]
 path_template = "{roomid}/{roomid}_{year}{month}{day}-{hour}-{minute}-{second}" # Don't change this
@@ -34,11 +30,11 @@ cookie = ""
 
 [danmaku]
 danmu_uname = false
-record_gift_send = true
+record_gift_send = false
 record_free_gifts = false
-record_guard_buy = true
-record_super_chat = true
-save_raw_danmaku = true
+record_guard_buy = false
+record_super_chat = false
+save_raw_danmaku = false
 
 [recorder]
 stream_format = "flv"

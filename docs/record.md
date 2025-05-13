@@ -77,7 +77,7 @@ aiohttp.client_exceptions.ClientResponseError: 412, message='Precondition Failed
 
 The recording part I use [blrec](https://github.com/acgnhiki/blrec), according to the [corresponding issue](https://github.com/acgnhiki/blrec/pull/264) it seems to be blocked by risk control. This is the [Bilibili API error 412 situation](https://github.com/SocialSisterYi/bilibili-API-collect/issues/872).
 
-Solution: I recommend adding or replacing UA, you can also consider adding cookies, wait a few minutes to execute `./record.sh` to retry. Or use docker to deploy blrec separately.
+Solution: I recommend adding or replacing UA, you can also consider adding cookies, wait a few minutes to execute `./record.sh` to retry.
 
 ## `http://localhost:2233/settings` webpage cannot be accessed
 

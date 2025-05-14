@@ -41,6 +41,14 @@ This is a font missing problem, often appearing in manual deployment, I default 
 
 Due to the usually 10 ~ 15x rendering speed of danmaku under nvidia acceleration, and the speed of whisper executing speech recognition is 5x, so the previous way of creating danmaku rendering by whisper is completely feasible, but for live broadcasts with a large number of danmaku (20 minutes fragment produces 15400+ danmaku), the rendering speed will drop to 2 ~ 4x, when the new whisper processed fragment is rendered, the rendering speed will further decrease, and the number of accumulated parallel danmaku rendering processes will exceed 3, which will cause failure due to the limit of the number of concurrent encoding of the graphics card, in addition, there is a risk of out of memory. Therefore, in order to ensure the quality of rendering and the stability of the program, I originally changed back to the queue rendering method to process danmaku rendering.
 
+## WSL running error ERROR: [Errno -2] Name or service not known
+
+The problem of host name resolution, wsl usually has more network problems. From [issue 159](https://github.com/timerring/bilive/issues/159)
+
+Solution: There are two main ideas:
+1. Check the network content: https://unix.stackexchange.com/questions/589683/wsl-dns-not-working-when-connected-to-vpn
+2. Don't start with record.sh, directly execute blrec in the command line terminal, then browse to `http://localhost:2233` (default), according to https://blog.csdn.net/Yiang0/article/details/127780263, the local Windows can directly access WSL2 through localhost, check if there is a normal running process.
+
 ## No slice is produced during recording
 
 > First check if `AUTO_SLICE` is `True`, if it is `False`, no slice processing will be performed.
@@ -72,3 +80,4 @@ Solution: Refer to [this article](https://zhuanlan.zhihu.com/p/466793485).
 > - `tid` is the video category ID, see https://bilitool.timerring.com/tid.html.
 > - `gift_price_filter` is the minimum price of gifts to be filtered, unit: RMB.
 > - `reserve_for_fixing` is whether to reserve the video for fixing if MOOV crash error occurs.
+> - `upload_line` is the upload line to be used, default is "auto" (recommended), can be "bldsa", "ws", "tx", "qn", "bda2".

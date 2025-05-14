@@ -1,5 +1,8 @@
 # Quick start
 
+> [!NOTE]
+> If you are a windows user, please use WSL to run this project.
+
 ### Mode
 
 First, introduce the three different processing modes of this project:
@@ -8,6 +11,9 @@ First, introduce the three different processing modes of this project:
 3. `merge` mode: Wait for all recordings to complete, then perform the rendering merging process, the uploads are all complete versions of the recordings (non-P submissions), the waiting time is longer, the efficiency is slower, and it is suitable for scenarios that need to upload complete recordings.
 
 ### Installation
+
+> [!TIP]
+> If you are a windows user, please use WSL to run this project.
 
 #### 0. clone project
 

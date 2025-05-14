@@ -25,9 +25,3 @@ According to https://github.com/triton-lang/triton/issues/1057, there may be suc
 Solution: I checked that the pypi library has updated the triton 3.1.0 version: https://pypi.org/project/triton/#history, you can consider upgrading pip, or directly pull the whl installation from huggingface, it is not a problem. The test machine version is linux python3.10.12 pip, it is not a problem.
 
 > Also, triton is a library for inference, if you don't need to use whisper to generate subtitles, you can also not install it.
-
-## ModuleNotFoundError: No module named 'fcntl'
-
-The file lock `fcntl` module does not support windows, there are some alternative ways, but the best solution is to use WSL to run this project.
-
-Solution: Use WSL to run this project.

@@ -1,48 +1,34 @@
 # bilive
 
-> [!NOTE]
-> 如果你是 windows 用户，请使用 WSL 运行本项目。
-
-### Mode
+## Mode
 
 首先介绍本项目三种不同的处理模式：
 1. `pipeline` 模式(默认): 目前最快的模式，最好在 `blrec` 设置片段为半小时以内，分 p 上传视频片段。
 2. `append` 模式: 基本同上，但渲染过程串行执行，比 pipeline 慢预计 25% 左右。
 3. `merge` 模式: 等待所有录制完成，再进行渲染合并过程，上传均为完整版录播（非分 P 投稿），等待时间较长，效率较慢，适合需要上传完整录播的场景。
 
-### Installation
+## Installation
 
-> [!TIP]
-> 如果你是 windows 用户，请使用 WSL 运行本项目。
-
-#### 0. clone 项目
-
-由于项目引入了我写的 submodule [DanmakuConvert](https://github.com/timerring/DanmakuConvert) 和 [bilitool](https://github.com/timerring/bilitool)，因此推荐 clone 项目时就更新 submodules。
-
-```bash
-git clone --recurse-submodules https://github.com/timerring/bilive.git
+### 1.安装 ffmpeg
+```
+apt install ffmpeg pip-python3 -y
 ```
 
-如果你没有采用上述方式 clone 项目，请更新 submodules：
+### 2. clone 项目
 
 ```bash
-git submodule update --init --recursive
+git clone --recurse-submodules https://github.com/keepraw/bilive.git
 ```
-
-#### 1. 安装依赖(推荐创建虚拟环境)
+### 3. 安装依赖(推荐创建虚拟环境)
 
 ```
 cd bilive
 pip install -r requirements.txt
 ```
 
-此外请根据各自的系统类型安装对应的 [`ffmpeg`](https://www.ffmpeg.org/download.html)，例如 [ubuntu 安装 ffmpeg](https://gcore.com/learning/how-to-install-ffmpeg-on-ubuntu/)。
+### 4. 配置参数
 
-[常见问题收集](https://timerring.github.io/bilive/install-questions.html)
-
-#### 2. 配置参数
-
-##### 2.1 配置上传参数
+#### 4.1 配置上传参数
 
 在 `bilive.toml` 中自定义相关配置，映射关键词为 `{artist}`、`{date}`、`{title}`、`{source_link}`，请自行组合删减定制模板：
 
@@ -53,7 +39,7 @@ pip install -r requirements.txt
 - `reserve_for_fixing = false` 表示如果视频出现错误，重试失败后不保留视频用于修复，推荐硬盘空间有限的用户设置 false。
 - `upload_line = "auto"` 表示自动探测上传线路并上传，如果需要指定固定的线路，可以设置为 `bldsa`、`ws`、`tx`、`qn`、`bda2`。
 
-#### 3. 配置录制参数
+### 4.2. 配置录制参数
 
 > [!IMPORTANT]
 > 请不要修改任何有关路径的任何配置，否则会导致上传模块不可用
@@ -64,13 +50,7 @@ pip install -r requirements.txt
 - 录制模块默认不登录录制超清画质，如需登录，请将 `cookie.json` 文件（见步骤 4）中的 `SESSDATA` 参数值填写到 `[header]` 的 `cookie` 部分，格式为 `cookie = "SESSDATA=XXXXXXXXXXX"`，登录后可以录制更高画质的视频。（推荐不登录）
 - `duration_limit` 表示录制时长。
 
-#### 4. bilitool 登录（持久化登录，此步骤仅需执行一次）
-
-> docker 部署可以忽略此步骤，因为 `docker logs` 可以在控制台打印二维码，直接扫码登录即可，以下内容为源码部署。
-
-##### 4.1 方法一：通过 cookie 登录
-
-一般日志文件不会打印二维码效果，因此此步骤需要提前在机器上安装：
+### 5. bilitool 登录（持久化登录，此步骤仅需执行一次）
 
 ```
 pip install bilitool
@@ -80,19 +60,7 @@ bilitool login --export
 
 将登录的 cookie.json 文件放在本项目根目录下，`./upload.sh` 启动后会自动删除。
 
-##### 4.2 方法二：通过 submodule 登录
-
-或者你可以在 submodule 中登录，方式如下：
-
-```
-cd src/upload/bilitool
-python -m bilitool.cli login
-# 然后使用 app 扫码登录
-```
-
-[常见问题收集](https://timerring.github.io/bilive/biliup.html)
-
-#### 5. 启动自动录制
+### 6. 启动自动录制
 
 > [!IMPORTANT]
 > 使用默认密码并在具有公网 IP 的服务器上暴露端口存在暴露 cookie 的潜在风险，因此**不推荐**在具有公网 IP 的服务器上映射端口。
@@ -100,22 +68,17 @@ python -m bilitool.cli login
 > - 你可以限制服务器端口的入站 IP 规则或使用 nginx 等限制访问。
 
 启动前请设置录制前端页面的密码，并保存在 `RECORD_KEY` 环境变量中，`your_password` 由字母和数字组成，最少 8 位，最多 80 位。
-- 临时设置密码 `export RECORD_KEY=your_password`。（推荐）
 - 持久设置密码 `echo "export RECORD_KEY=your_password" >> ~/.bashrc && source ~/.bashrc`，其中 `~/.bashrc` 可以根据你使用的 shell 自行修改。
 
 ```bash
 ./record.sh
 ```
 
-[常见问题收集](https://timerring.github.io/bilive/record.html)
-
-#### 6. 启动自动上传
+### 7. 启动自动上传
 
 ```bash
 ./upload.sh
 ```
-
-[常见问题收集](https://timerring.github.io/bilive/upload.html)
 
 #### 日志信息
 
@@ -132,10 +95,3 @@ logs # 日志文件夹
 └── runtime # 运行时日志 [info] 级别
     └── ...
 ```
-
-## 特别感谢
-
-- [acgnhiki/blrec](https://github.com/acgnhiki/blrec)
-- [OpenAI/whisper](https://github.com/OpenAI/whisper)
-- [biliup/biliup-rs](https://github.com/biliup/biliup-rs)
-- [hihkm/DanmakuFactory](https://github.com/hihkm/DanmakuFactory)

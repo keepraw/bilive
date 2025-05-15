@@ -11,7 +11,7 @@
 
 ### 1.安装 ffmpeg
 ```
-apt install ffmpeg pip-python3 -y
+apt install ffmpeg python3-pip -y
 ```
 
 ### 2. clone 项目

@@ -84,7 +84,6 @@ def render_video(video_path):
     # Get the video info
     original_video_path = video_path
     format_video_path = normalize_video_path(original_video_path)
-    xml_path = original_video_path[:-4] + ".xml"
     jsonl_path = original_video_path[:-4] + ".jsonl"
 
     # Check if the file is already in mp4 format
@@ -97,7 +96,7 @@ def render_video(video_path):
         format_video(original_video_path, format_video_path)
 
     # Delete relative files
-    for remove_path in [original_video_path, xml_path, jsonl_path]:
+    for remove_path in [original_video_path, jsonl_path]:
         if os.path.exists(remove_path) and remove_path != format_video_path:
             os.remove(remove_path)
 

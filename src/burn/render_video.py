@@ -81,24 +81,39 @@ def render_video(video_path):
         scan_log.error(f"Video file not found: {video_path}")
         return
 
-    # Get the video info
-    original_video_path = video_path
-    format_video_path = normalize_video_path(original_video_path)
-    jsonl_path = original_video_path[:-4] + ".jsonl"
+    try:
+        # Get the video info
+        original_video_path = video_path
+        format_video_path = normalize_video_path(original_video_path)
+        jsonl_path = original_video_path[:-4] + ".jsonl"
 
-    # Check if the file is already in mp4 format
-    if original_video_path.lower().endswith('.mp4'):
-        scan_log.info("File is already in mp4 format, just renaming...")
-        if original_video_path != format_video_path:
-            os.rename(original_video_path, format_video_path)
-    else:
-        # Format the video from flv to mp4
-        format_video(original_video_path, format_video_path)
+        # Check if the file is already in mp4 format
+        if original_video_path.lower().endswith('.mp4'):
+            scan_log.info("File is already in mp4 format, just renaming...")
+            if original_video_path != format_video_path:
+                os.rename(original_video_path, format_video_path)
+        else:
+            # Format the video from flv to mp4
+            format_video(original_video_path, format_video_path)
 
-    # Delete relative files
-    for remove_path in [original_video_path, jsonl_path]:
-        if os.path.exists(remove_path) and remove_path != format_video_path:
-            os.remove(remove_path)
+        # Delete relative files only if they exist and are different from target
+        for remove_path in [original_video_path, jsonl_path]:
+            if os.path.exists(remove_path) and remove_path != format_video_path:
+                try:
+                    os.remove(remove_path)
+                except Exception as e:
+                    scan_log.warning(f"Failed to remove file {remove_path}: {e}")
 
-    if not insert_upload_queue(format_video_path):
-        scan_log.error("Cannot insert the video to the upload queue")
+        # Try to insert into upload queue, but don't fail if it errors
+        try:
+            if not insert_upload_queue(format_video_path):
+                scan_log.warning("Cannot insert the video to the upload queue, but postprocessing completed")
+        except Exception as e:
+            scan_log.warning(f"Failed to insert into upload queue: {e}, but postprocessing completed")
+
+        scan_log.info(f"Successfully processed video: {format_video_path}")
+        return True
+
+    except Exception as e:
+        scan_log.error(f"Error processing video {video_path}: {e}")
+        return False

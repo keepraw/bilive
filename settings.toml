@@ -1,25 +1,18 @@
 version = "1.0"
 webhooks = []
-
-# blrec Settings
 [[tasks]]
-room_id = 173551
-enable_monitor = true
-enable_recorder = true
-
-[[tasks]]
-room_id = 7734200
+room_id = 23384133
 enable_monitor = true
 enable_recorder = true
 
 [output]
-path_template = "{roomid}/{roomid}_{year}{month}{day}-{hour}-{minute}-{second}" # Don't change this
+path_template = "{roomid}/{roomid}_{year}{month}{day}-{hour}-{minute}-{second}"
 filesize_limit = 0
-duration_limit = 1800
-out_dir = "./Videos" # Don't change this
+duration_limit = 3600
+out_dir = "./Videos"
 
 [logging]
-log_dir = "./logs/record" # Don't change this
+log_dir = "./logs/record"
 console_log_level = "INFO"
 backup_count = 30
 
@@ -34,11 +27,11 @@ cookie = ""
 
 [danmaku]
 danmu_uname = false
-record_gift_send = true
+record_gift_send = false
 record_free_gifts = false
-record_guard_buy = true
-record_super_chat = true
-save_raw_danmaku = true
+record_guard_buy = false
+record_super_chat = false
+save_raw_danmaku = false
 
 [recorder]
 stream_format = "flv"

@@ -25,21 +25,6 @@ def load_config_from_toml(file_path):
     return None
 
 
-def get_model_path():
-    SRC_DIR = str(Path(os.path.abspath(__file__)).parent)
-    model_dir = os.path.join(SRC_DIR, "subtitle", "models")
-    model_path = os.path.join(model_dir, f"{INFERENCE_MODEL}.pt")
-    return model_path
-
-
-def get_interface_config():
-    interface_config = configparser.ConfigParser()
-    interface_dir = os.path.join(SRC_DIR, "subtitle")
-    interface_file = os.path.join(interface_dir, "en.ini")
-    interface_config.read(interface_file, encoding="utf-8")
-    return interface_config
-
-
 SRC_DIR = str(Path(os.path.abspath(__file__)).parent)
 BILIVE_DIR = str(Path(SRC_DIR).parent)
 LOG_DIR = os.path.join(BILIVE_DIR, "logs")
@@ -54,9 +39,6 @@ if config is None:
     exit(1)
 
 MODEL_TYPE = config.get("model", {}).get("model_type")
-ASR_METHOD = config.get("asr", {}).get("asr_method")
-WHISPER_API_KEY = config.get("asr", {}).get("whisper_api_key")
-INFERENCE_MODEL = config.get("asr", {}).get("inference_model")
 
 TITLE = config.get("video", {}).get("title")
 DESC = config.get("video", {}).get("description")

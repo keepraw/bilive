@@ -8,7 +8,6 @@ from src.config import (
     BILIVE_DIR,
     RESERVE_FOR_FIXING,
     UPLOAD_LINE,
-    GENERATE_COVER,
 )
 from datetime import datetime
 from src.upload.generate_upload_data import generate_video_data, generate_slice_data
@@ -24,7 +23,6 @@ from db.conn import (
 )
 from .bilitool.bilitool import UploadController, FeedController, LoginController
 from src.log.retry import Retry
-from src.cover.cover_generator import generate_cover
 
 
 @Retry(max_retry=3, interval=5).decorator
@@ -32,10 +30,6 @@ def upload_video(upload_path):
     try:
         if upload_path.endswith(".flv"):
             title, tid, tag, source = generate_slice_data(upload_path)
-            if GENERATE_COVER:
-                cover = generate_cover(upload_path)
-            else:
-                cover = ""
             yaml, desc, dynamic = ("",) * 3
             if title is None:
                 upload_log.error(

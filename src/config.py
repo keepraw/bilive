@@ -4,7 +4,6 @@ import os
 from pathlib import Path
 from datetime import datetime
 import configparser
-import torch
 import toml
 from db.conn import create_table
 
@@ -54,7 +53,6 @@ if config is None:
     print("failed to load config file, please check twice", flush=True)
     exit(1)
 
-GPU_EXIST = torch.cuda.is_available()
 MODEL_TYPE = config.get("model", {}).get("model_type")
 ASR_METHOD = config.get("asr", {}).get("asr_method")
 WHISPER_API_KEY = config.get("asr", {}).get("whisper_api_key")
@@ -66,32 +64,3 @@ TID = config.get("video", {}).get("tid")
 GIFT_PRICE_FILTER = config.get("video", {}).get("gift_price_filter")
 RESERVE_FOR_FIXING = config.get("video", {}).get("reserve_for_fixing")
 UPLOAD_LINE = config.get("video", {}).get("upload_line")
-AUTO_SLICE = config.get("slice", {}).get("auto_slice")
-SLICE_DURATION = config.get("slice", {}).get("slice_duration")
-SLICE_NUM = config.get("slice", {}).get("slice_num")
-SLICE_OVERLAP = config.get("slice", {}).get("slice_overlap")
-SLICE_STEP = config.get("slice", {}).get("slice_step")
-MIN_VIDEO_SIZE = config.get("slice", {}).get("min_video_size")
-MLLM_MODEL = config.get("slice", {}).get("mllm_model")
-ZHIPU_API_KEY = config.get("slice", {}).get("zhipu_api_key")
-GEMINI_API_KEY = config.get("slice", {}).get("gemini_api_key")
-QWEN_API_KEY = config.get("slice", {}).get("qwen_api_key")
-SENSENOVA_API_KEY = config.get("slice", {}).get("sensenova_api_key")
-
-GENERATE_COVER = config.get("cover", {}).get("generate_cover")
-IMAGE_GEN_MODEL = config.get("cover", {}).get("image_gen_model")
-MINIMAX_API_KEY = config.get("cover", {}).get("minimax_api_key")
-SILICONFLOW_API_KEY = config.get("cover", {}).get("siliconflow_api_key")
-TENCENT_SECRET_ID = config.get("cover", {}).get("tencent_secret_id")
-TENCENT_SECRET_KEY = config.get("cover", {}).get("tencent_secret_key")
-BAIDU_API_KEY = config.get("cover", {}).get("baidu_api_key")
-STABILITY_API_KEY = config.get("cover", {}).get("stability_api_key")
-LUMA_API_KEY = config.get("cover", {}).get("luma_api_key")
-IDEOGRAM_API_KEY = config.get("cover", {}).get("ideogram_api_key")
-RECRAFT_API_KEY = config.get("cover", {}).get("recraft_api_key")
-AWS_ACCESS_KEY_ID = config.get("cover", {}).get("aws_access_key_id")
-AWS_SECRET_ACCESS_KEY = config.get("cover", {}).get("aws_secret_access_key")
-HIDREAM_API_KEY = config.get("cover", {}).get("hidream_api_key")
-DMX_API_TOKEN = config.get("cover", {}).get("dmx_api_token")
-SLICE_PROMPT = config.get("slice", {}).get("slice_prompt")
-COVER_PROMPT = config.get("cover", {}).get("cover_prompt")

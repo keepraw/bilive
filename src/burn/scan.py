@@ -6,8 +6,7 @@ import threading
 from pathlib import Path
 from src.config import VIDEOS_DIR, MODEL_TYPE
 from src.burn.render_queue import VideoRenderQueue
-from src.burn.render_video import render_video
-from src.burn.render_then_merge import render_then_merge
+from src.burn.render_video import process_video
 from src.log.logger import scan_log
 
 
@@ -35,14 +34,15 @@ def process_folder_merge(folder_path):
 
     for date, files in files_by_date.items():
         if len(files) > 1:
-            # If there are multiple segments with the same date, merge them
+            # If there are multiple segments with the same date, process the first one
+            # which will trigger the merge process
             sorted_files = sorted(files, key=lambda x: x.stem.split("_")[1])
-            scan_log.info(f"Merging {sorted_files}...")
-            render_then_merge(sorted_files)
+            scan_log.info(f"Processing {sorted_files[0]} for merging...")
+            process_video(str(sorted_files[0]))
         else:
             for file in files:
                 scan_log.info(f"Begin processing {file}...")
-                render_video(file)
+                process_video(str(file))
 
 
 def process_folder_append(folder_path):
@@ -56,9 +56,9 @@ def process_folder_append(folder_path):
     for file in mp4_files:
         scan_log.info(f"Begin processing {file}...")
         if MODEL_TYPE == "pipeline":
-            video_render_queue.pipeline_render(file)
+            video_render_queue.pipeline_render(str(file))
         else:
-            render_video(file)
+            process_video(str(file))
 
 
 if __name__ == "__main__":

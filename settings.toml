@@ -38,6 +38,10 @@ record_guard_buy = false
 record_super_chat = false
 save_raw_danmaku = false
 
+[default_task_setting]
+[default_task_setting.danmaku]
+ enable = false  # 设置为 false 来禁用弹幕录制，或 true 来启用
+
 [recorder]
 stream_format = "flv"
 recording_mode = "standard"

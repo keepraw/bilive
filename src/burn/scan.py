@@ -2,25 +2,44 @@
 
 import os
 import time
-import threading
 from pathlib import Path
 from src.config import VIDEOS_DIR, MODEL_TYPE
-from src.burn.render_queue import VideoRenderQueue
-from src.burn.render_video import render_video
-from src.burn.render_then_merge import render_then_merge
+from src.burn.video_processor import render_video, render_then_merge
 from src.log.logger import scan_log
 
 
+def clean_related_files(folder_path):
+    """清理不再需要的相关文件
+    Args:
+        folder_path: str, 视频文件夹路径
+    """
+    # 删除 xml 弹幕文件
+    xml_files = list(Path(folder_path).glob("*.xml"))
+    for xml_file in xml_files:
+        try:
+            os.remove(xml_file)
+            scan_log.info(f"Removed xml file: {xml_file}")
+        except Exception as e:
+            scan_log.error(f"Failed to remove xml file {xml_file}: {e}")
+
+
 def process_folder_merge(folder_path):
-    # Don't process the recording folder
+    """处理文件夹中的视频文件，合并同一天的视频片段
+    Args:
+        folder_path: str, 视频文件夹路径
+    """
+    # 不处理正在录制的文件夹
     flv_files = list(Path(folder_path).glob("*.flv"))
     if flv_files:
         scan_log.info(f"Found flv files in {folder_path}. Skipping.")
         return
 
+    # 清理不再需要的相关文件
+    clean_related_files(folder_path)
+
     files_by_date = {}
 
-    # process the recorded files
+    # 处理录制的文件
     mp4_files = [
         mp4_file
         for mp4_file in Path(folder_path).glob("*.mp4")
@@ -35,7 +54,7 @@ def process_folder_merge(folder_path):
 
     for date, files in files_by_date.items():
         if len(files) > 1:
-            # If there are multiple segments with the same date, merge them
+            # 如果有多个同一天的片段，合并它们
             sorted_files = sorted(files, key=lambda x: x.stem.split("_")[1])
             scan_log.info(f"Merging {sorted_files}...")
             render_then_merge(sorted_files)
@@ -46,7 +65,14 @@ def process_folder_merge(folder_path):
 
 
 def process_folder_append(folder_path):
-    # process the recorded files
+    """按顺序处理文件夹中的视频文件
+    Args:
+        folder_path: str, 视频文件夹路径
+    """
+    # 清理不再需要的相关文件
+    clean_related_files(folder_path)
+
+    # 处理录制的文件
     mp4_files = [
         mp4_file
         for mp4_file in Path(folder_path).glob("*.mp4")
@@ -55,23 +81,34 @@ def process_folder_append(folder_path):
     mp4_files.sort()
     for file in mp4_files:
         scan_log.info(f"Begin processing {file}...")
-        if MODEL_TYPE == "pipeline":
-            video_render_queue.pipeline_render(file)
-        else:
-            render_video(file)
+        render_video(file)
+
+
+def process_folder(folder_path):
+    """根据配置的模式处理文件夹
+    Args:
+        folder_path: str, 视频文件夹路径
+    """
+    if MODEL_TYPE == "merge":
+        process_folder_merge(folder_path)
+    elif MODEL_TYPE == "append":
+        process_folder_append(folder_path)
+    else:
+        scan_log.error(f"Unknown model type: {MODEL_TYPE}, using append mode as fallback")
+        process_folder_append(folder_path)
 
 
 if __name__ == "__main__":
     room_folder_path = VIDEOS_DIR
-    video_render_queue = VideoRenderQueue()
-    monitor_thread = threading.Thread(target=video_render_queue.monitor_queue)
-    monitor_thread.start()
+    scan_log.info(f"Starting video processing in {MODEL_TYPE} mode")
+    
     while True:
-        for room_folder in Path(room_folder_path).iterdir():
-            if room_folder.is_dir():
-                if MODEL_TYPE == "merge":
-                    process_folder_merge(room_folder)
-                else:
-                    process_folder_append(room_folder)
-        scan_log.info("There is no file recorded. Check again in 120 seconds.")
-        time.sleep(120)
+        try:
+            for room_folder in Path(room_folder_path).iterdir():
+                if room_folder.is_dir():
+                    process_folder(room_folder)
+            scan_log.info("There is no file recorded. Check again in 120 seconds.")
+            time.sleep(120)
+        except Exception as e:
+            scan_log.error(f"Error occurred during processing: {e}")
+            time.sleep(120)  # 发生错误时也等待120秒后重试

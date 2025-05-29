@@ -1,21 +1,23 @@
 version = "1.0"
 webhooks = []
-
-# blrec Settings
 [[tasks]]
 room_id = 23384133
 enable_monitor = true
 enable_recorder = true
 
+[[tasks]]
+room_id = 7261262
+enable_monitor = true
+enable_recorder = true
 
 [output]
-path_template = "{roomid}/{roomid}_{year}{month}{day}-{hour}-{minute}-{second}" # Don't change this
+path_template = "{roomid}/{roomid}_{year}{month}{day}-{hour}-{minute}-{second}"
 filesize_limit = 0
-duration_limit = 1800
-out_dir = "./Videos" # Don't change this
+duration_limit = 3600
+out_dir = "./Videos"
 
 [logging]
-log_dir = "./logs/record" # Don't change this
+log_dir = "./logs/record"
 console_log_level = "INFO"
 backup_count = 30
 

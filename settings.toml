@@ -5,11 +5,6 @@ room_id = 23384133
 enable_monitor = true
 enable_recorder = true
 
-[[tasks]]
-room_id = 7261262
-enable_monitor = true
-enable_recorder = true
-
 [output]
 path_template = "{roomid}/{roomid}_{year}{month}{day}-{hour}-{minute}-{second}"
 filesize_limit = 0

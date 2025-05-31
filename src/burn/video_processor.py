@@ -75,7 +75,6 @@ def render_video(video_path):
     # 获取视频信息
     original_video_path = video_path
     format_video_path = normalize_video_path(original_video_path)
-    jsonl_path = original_video_path[:-4] + ".jsonl"
 
     # 检查文件是否已经是mp4格式
     if original_video_path.lower().endswith('.mp4'):
@@ -86,10 +85,9 @@ def render_video(video_path):
         # 将flv格式转换为mp4
         format_video(original_video_path, format_video_path)
 
-    # 删除相关文件
-    for remove_path in [original_video_path, jsonl_path]:
-        if os.path.exists(remove_path) and remove_path != format_video_path:
-            os.remove(remove_path)
+    # 删除原始文件
+    if os.path.exists(original_video_path) and original_video_path != format_video_path:
+        os.remove(original_video_path)
 
     if not insert_upload_queue(format_video_path):
         scan_log.error("Cannot insert the video to the upload queue")

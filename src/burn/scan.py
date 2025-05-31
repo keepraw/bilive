@@ -8,21 +8,6 @@ from src.burn.video_processor import render_video, render_then_merge
 from src.log.logger import scan_log
 
 
-def clean_related_files(folder_path):
-    """清理不再需要的相关文件
-    Args:
-        folder_path: str, 视频文件夹路径
-    """
-    # 删除 xml 弹幕文件
-    xml_files = list(Path(folder_path).glob("*.xml"))
-    for xml_file in xml_files:
-        try:
-            os.remove(xml_file)
-            scan_log.info(f"Removed xml file: {xml_file}")
-        except Exception as e:
-            scan_log.error(f"Failed to remove xml file {xml_file}: {e}")
-
-
 def process_folder_merge(folder_path):
     """处理文件夹中的视频文件，合并同一天的视频片段
     Args:
@@ -33,9 +18,6 @@ def process_folder_merge(folder_path):
     if flv_files:
         scan_log.info(f"Found flv files in {folder_path}. Skipping.")
         return
-
-    # 清理不再需要的相关文件
-    clean_related_files(folder_path)
 
     files_by_date = {}
 
@@ -69,9 +51,6 @@ def process_folder_append(folder_path):
     Args:
         folder_path: str, 视频文件夹路径
     """
-    # 清理不再需要的相关文件
-    clean_related_files(folder_path)
-
     # 处理录制的文件
     mp4_files = [
         mp4_file

@@ -1,0 +1,7 @@
+[submodule "src/upload/bilitool"]
+	path = src/upload/bilitool
+	url = https://github.com/keepraw/bilitool.git
+
+[submodule "src/blrec"]
+	path = src/blrec
+	url = https://github.com/keepraw/blrec.git

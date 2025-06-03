@@ -1,0 +1,12 @@
+-e ./src/blrec
+ffmpeg_python==0.2.0
+more_itertools==10.6.0
+numpy>=1.21.6, <1.26.4
+six==1.16.0
+zhconv==1.4.3
+Pillow>=5.2.0
+PyYAML>=6.0.2
+qrcode>=8.0
+tqdm>=4.67.1
+Requests>=2.32.3
+toml

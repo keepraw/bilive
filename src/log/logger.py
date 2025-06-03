@@ -32,17 +32,6 @@ class Logger:
             console_handler.setFormatter(formatter)
             logger.addHandler(console_handler)
 
-            # file output
-            now = time.strftime("%Y%m%d", time.localtime(time.time()))
-            log_folder = f"{LOG_DIR}/{self.log_file_prefix}"
-            if not os.path.exists(log_folder):
-                os.makedirs(log_folder)
-            path = f"{log_folder}/{self.log_file_prefix}-{now}.log"
-            file_handler = logging.FileHandler(path, encoding="UTF-8")
-            file_handler.setLevel("DEBUG")
-            file_handler.setFormatter(formatter)
-            logger.addHandler(file_handler)
-
         return logger
 
 

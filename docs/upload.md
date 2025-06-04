@@ -8,7 +8,6 @@ Customize the relevant configuration in `bilive.toml`, map the keywords to `{art
 
 - `title` title template.
 - `description` description template.
-- `gift_price_filter = 1` means filtering gifts with a price lower than 1 yuan.
 - `reserve_for_fixing = false` means if the video is uploaded with an error, it will not be reserved for fixing, it is recommended to set false for users with limited hard disk space.
 - `upload_line = "auto"` means automatically detecting the upload line and uploading, if you need to specify a fixed line, you can set it to `bldsa`、`ws`、`tx`、`qn`、`bda2`.
 

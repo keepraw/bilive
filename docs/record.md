@@ -55,17 +55,7 @@ Solution: Switch the recording encoding, select hls encoding, and then re-record
 
 ## The project is already in the recording state, but it cannot work after restarting
 
-Restarting requires waiting for about half a minute, because it adds a room and verifies the start of the danmaku server, so it can try to close the room recording and then open it again.
-
-## The danmaku xml and jsonl are empty
-
-From [issue 123](https://github.com/timerring/bilive/issues/123)
-
-Please fill in a roomid with more than 7 digits, 84074 is a short link for Bilibili to promote, the user jumps directly to the real roomid, the real roomid is assigned when applying for broadcast permission, which should be 7～9 digits.
-
-**The danmaku server cannot obtain the danmaku through the short link. Because the short link only plays a mapping jump role.**
-
-Solution: Share the live broadcast in the `图片分享` way in the mobile share, and then Bilibili mobile will automatically generate an image with the real roomid. Fill in this roomid.
+Restarting requires waiting for about half a minute.
 
 ## Failed to add room `aiohttp.client_exceptions.ClientResponseError: 412 `
 

@@ -1,9 +1,7 @@
 # bilive
 
 ## Mode
-
-首先介绍本项目三种不同的处理模式：
-1. `append` 模式: 基本同上，但渲染过程串行执行，比 pipeline 慢预计 25% 左右。
+1. `append` 模式: 分段视频录制完毕即上传。
 2. `merge` 模式: 等待所有录制完成，再进行渲染合并过程，上传均为完整版录播（非分 P 投稿），等待时间较长，效率较慢，适合需要上传完整录播的场景。
 
 ## Installation
@@ -12,7 +10,6 @@
 ```
 apt install ffmpeg python3-pip -y
 ```
-
 ### 2. clone 项目
 
 ```bash
@@ -24,7 +21,6 @@ git clone --recurse-submodules https://github.com/keepraw/bilive.git
 cd bilive
 pip install -r requirements.txt
 ```
-
 ### 4. 配置参数
 
 #### 4.1 配置上传参数
@@ -38,7 +34,7 @@ pip install -r requirements.txt
 - `reserve_for_fixing = false` 表示如果视频出现错误，重试失败后不保留视频用于修复，推荐硬盘空间有限的用户设置 false。
 - `upload_line = "auto"` 表示自动探测上传线路并上传，如果需要指定固定的线路，可以设置为 `bldsa`、`ws`、`tx`、`qn`、`bda2`。
 
-### 4.2. 配置录制参数
+#### 4.2. 配置录制参数
 
 > [!IMPORTANT]
 > 请不要修改任何有关路径的任何配置，否则会导致上传模块不可用
@@ -57,40 +53,30 @@ bilitool login --export
 # 然后使用 app 扫码登录，会自动导出 cookie.json 文件
 ```
 
-将登录的 cookie.json 文件放在本项目根目录下，`./upload.sh` 启动后会自动删除。
+将登录的 cookie.json 文件放在本项目根目录下。
 
 ### 6. 启动自动录制
 
 > [!IMPORTANT]
-> 使用默认密码并在具有公网 IP 的服务器上暴露端口存在暴露 cookie 的潜在风险，因此**不推荐**在具有公网 IP 的服务器上映射端口。
 > - 如需使用 https，可以考虑使用 openssl 自签名证书，并在 `record.sh` 中添加参数 `--key-file path/to/key-file --cert-file path/to/cert-file`。
-> - 你可以限制服务器端口的入站 IP 规则或使用 nginx 等限制访问。
 
 启动前请设置录制前端页面的密码，并保存在 `RECORD_KEY` 环境变量中，`your_password` 由字母和数字组成，最少 8 位，最多 80 位。
-- 持久设置密码 `echo "export RECORD_KEY=your_password" >> ~/.bashrc && source ~/.bashrc`，其中 `~/.bashrc` 可以根据你使用的 shell 自行修改。
+- 设置密码 `echo "export RECORD_KEY=your_password" >> ~/.bashrc && source ~/.bashrc`，其中 `~/.bashrc` 可以根据你使用的 shell 自行修改。
 
 ```bash
 ./record.sh
 ```
-
 ### 7. 启动自动上传
 
 ```bash
 ./upload.sh
 ```
-
 #### 日志信息
 
-对应的执行日志可以在 `logs` 文件夹中查看，如有问题请在 [`issue`](https://github.com/timerring/bilive/issues/new/choose) 中提交，如有异常请提供 [debug] 级别日志。
+对应的执行日志可以在 `logs` 文件夹中查看
 
 ```
 logs # 日志文件夹
 ├── record # blrec 录制日志
-│   └── ...
-├── scan # scan 处理日志 [debug] 级别
-│   └── ...
-├── upload # 上传日志 [debug] 级别
-│   └── ...
 └── runtime # 运行时日志 [info] 级别
-    └── ...
 ```

@@ -1,7 +1,7 @@
 version = "1.0"
 webhooks = []
 [[tasks]]
-room_id = 23384133
+room_id = 12345678 # only an examplt, please insert your designated room_id
 enable_monitor = true
 enable_recorder = true
 

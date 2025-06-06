@@ -1,6 +1,6 @@
 # bilive Settings
 [model]
-model_type = "append" # Can be pipeline, append, merge
+model_type = "append" # Can be append, or merge
 
 [video]
 # You can change the title as you like, eg.

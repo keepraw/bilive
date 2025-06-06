@@ -38,11 +38,9 @@ pip install -r requirements.txt
 > [!IMPORTANT]
 > 请不要修改任何有关路径的任何配置，否则会导致上传模块不可用
 
-> 录制模块使用第三方包 `blrec`，参数配置在 `settings.toml` 文件中，也可以在录制启动后在对应端口可视化页面配置。快速开始仅介绍关键配置，其他配置可以参照页面中的配置项自行理解，支持热修改。
+> 录制模块使用第三方包 `blrec`，参数配置在 `settings.toml` 文件中，建议录制启动后在对应端口可视化页面配置。支持热修改。
 
-- 添加房间按照文件中 `[[tasks]]` 对应的格式添加。
 - 录制模块默认不登录录制超清画质，如需登录，请将 `cookie.json` 文件（见步骤 4）中的 `SESSDATA` 参数值填写到 `[header]` 的 `cookie` 部分，格式为 `cookie = "SESSDATA=XXXXXXXXXXX"`，登录后可以录制更高画质的视频。（推荐不登录）
-- `duration_limit` 表示录制时长。
 
 ### 5. bilitool 登录（持久化登录，此步骤仅需执行一次）
 

@@ -1,4 +1,6 @@
-# bilive
+# bilive 无弹幕版
+
+感谢原作者 @timerring/bilive and @acgnhiki/blrec
 
 ## Mode
 1. `append` 模式: 分段视频录制完毕即上传。
